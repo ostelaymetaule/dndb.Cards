@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dndb.Cards", "dndb.Cards\dndb.Cards.csproj", "{0DC5EAE6-23A4-4416-A6F9-DC1D723BDF07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dndb.Cards.Parser", "dndb.Cards.Parser\dndb.Cards.Parser.csproj", "{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0DC5EAE6-23A4-4416-A6F9-DC1D723BDF07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0DC5EAE6-23A4-4416-A6F9-DC1D723BDF07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0DC5EAE6-23A4-4416-A6F9-DC1D723BDF07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0DC5EAE6-23A4-4416-A6F9-DC1D723BDF07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6094DDB5-B265-4CA5-81FE-715F69E49E65}
+	EndGlobalSection
+EndGlobal
