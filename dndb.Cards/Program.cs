@@ -1,12 +1,18 @@
-﻿using System;
+﻿using dndb.Cards.Parser;
+using System;
 
 namespace dndb.Cards
 {
     class Program
     {
-        static void Main(string[] args)
+        static async System.Threading.Tasks.Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+
+            string url = @"https://ddb.ac/characters/7577901/EwYJYR";
+            var parser = new CharacterLoader();
+            await parser.LoadSingleCharacterAsync(url);
+
+            Console.ReadKey(); ;
         }
     }
 }
