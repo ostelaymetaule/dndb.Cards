@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dndb.Cards", "dndb.Cards\dndb.Cards.csproj", "{0DC5EAE6-23A4-4416-A6F9-DC1D723BDF07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dndb.Cards", "dndb.Cards\dndb.Cards.csproj", "{0DC5EAE6-23A4-4416-A6F9-DC1D723BDF07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dndb.Cards.Parser", "dndb.Cards.Parser\dndb.Cards.Parser.csproj", "{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dndb.Cards.Parser", "dndb.Cards.Parser\dndb.Cards.Parser.csproj", "{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dndb.Cards.WPF", "dndb.Cards.WPF\dndb.Cards.WPF.csproj", "{257B957F-8FA7-4A9C-994A-31CAC3F2342E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{257B957F-8FA7-4A9C-994A-31CAC3F2342E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{257B957F-8FA7-4A9C-994A-31CAC3F2342E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{257B957F-8FA7-4A9C-994A-31CAC3F2342E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{257B957F-8FA7-4A9C-994A-31CAC3F2342E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
