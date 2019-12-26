@@ -1,5 +1,6 @@
 ﻿using AngleSharp;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -7,6 +8,36 @@ namespace dndb.Cards.Parser
 {
     public class CharacterLoader
     {
+        private DirectoryInfo _campaignDownloadDir;
+        private string _campaign;
+        public CharacterLoader(string campaign)
+        {
+            _campaign = campaign;
+            SetupDownloadPath(campaign);
+        }
+
+        private void SetupDownloadPath(string campaign)
+        {
+            DirectoryInfo downloadDir = new DirectoryInfo("downloads");
+            if (!downloadDir.Exists)
+            {
+                downloadDir.Create();
+            }
+            _campaignDownloadDir = downloadDir.GetDirectories().FirstOrDefault(x => x.Name == campaign);
+
+            if (_campaignDownloadDir==null)
+            {
+                _campaignDownloadDir = downloadDir.CreateSubdirectory(campaign);
+            }
+            
+        }
+        public List<string> GetDownloadedImagePaths()
+        {
+            return _campaignDownloadDir.GetFiles("*.png")
+                .Select(x=>x.FullName)
+                .ToList();
+        }
+
         /**
             example see below, og:image is the card image with the background rendered on the ddb
 
@@ -41,7 +72,7 @@ namespace dndb.Cards.Parser
 
         public async System.Threading.Tasks.Task LoadSingleCharacterAsync(string url)
         {
-           
+
             var config = Configuration.Default.WithDefaultLoader();
             var address = url;
             var context = BrowsingContext.New(config);
@@ -56,11 +87,11 @@ namespace dndb.Cards.Parser
             //<meta property="og:title" content="Gurandor" />
             var ogTitleSelector = "meta[property=og\\:title]";
             var ogTitleElement = document.Head.QuerySelector(ogTitleSelector);
-            var ogTitle = ogElement.GetAttribute("content");
-
+            var ogTitle = ogTitleElement.GetAttribute("content");
+            var downloadPath = Path.Combine(_campaignDownloadDir.FullName, ogTitle+ ".png");
 
             using (var client = new HttpClient())
-            using (var file = new FileStream(path: ogTitle + ".png", FileMode.OpenOrCreate))
+            using (var file = new FileStream(path: downloadPath, FileMode.OpenOrCreate))
             {
                 var response = await client.GetAsync(ogImageUrl);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
