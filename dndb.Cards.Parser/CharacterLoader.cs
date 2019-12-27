@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
+
 namespace dndb.Cards.Parser
 {
     public class CharacterLoader
@@ -70,36 +72,44 @@ namespace dndb.Cards.Parser
 
 
 
-        public async System.Threading.Tasks.Task LoadSingleCharacterAsync(string url)
+        public async Task LoadSingleCharacterAsync(string url)
         {
-
-            var config = Configuration.Default.WithDefaultLoader();
-            var address = url;
-            var context = BrowsingContext.New(config);
-            var document = await context.OpenAsync(address);
-
-            var ogImageSelector = "meta[property=og\\:image]";
-
-            var ogElement = document.Head.QuerySelector(ogImageSelector);
-            var ogImageUrl = ogElement.GetAttribute("content");
-
-
-            //<meta property="og:title" content="Gurandor" />
-            var ogTitleSelector = "meta[property=og\\:title]";
-            var ogTitleElement = document.Head.QuerySelector(ogTitleSelector);
-            var ogTitle = ogTitleElement.GetAttribute("content");
-            var downloadPath = Path.Combine(_campaignDownloadDir.FullName, ogTitle+ ".png");
-
-            using (var client = new HttpClient())
-            using (var file = new FileStream(path: downloadPath, FileMode.OpenOrCreate))
+            try
             {
-                var response = await client.GetAsync(ogImageUrl);
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                var config = Configuration.Default.WithDefaultLoader();
+                var address = url;
+                var context = BrowsingContext.New(config);
+                var document = await context.OpenAsync(address);
+
+                var ogImageSelector = "meta[property=og\\:image]";
+
+                var ogElement = document.Head.QuerySelector(ogImageSelector);
+                var ogImageUrl = ogElement.GetAttribute("content");
+
+
+                //<meta property="og:title" content="Gurandor" />
+                var ogTitleSelector = "meta[property=og\\:title]";
+                var ogTitleElement = document.Head.QuerySelector(ogTitleSelector);
+                var ogTitle = ogTitleElement.GetAttribute("content");
+                var downloadPath = Path.Combine(_campaignDownloadDir.FullName, ogTitle + ".png");
+
+                using (var client = new HttpClient())
+                using (var file = new FileStream(path: downloadPath, FileMode.OpenOrCreate))
                 {
-                    var memstream = await response.Content.ReadAsStreamAsync();
-                    await memstream.CopyToAsync(file);
+                    var response = await client.GetAsync(ogImageUrl);
+                    if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        var memstream = await response.Content.ReadAsStreamAsync();
+                        await memstream.CopyToAsync(file);
+                    }
                 }
             }
+            catch (Exception e)
+            {
+
+                throw;
+            }
+            
 
         }
     }
