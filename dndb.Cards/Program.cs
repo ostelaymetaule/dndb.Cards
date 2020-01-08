@@ -11,8 +11,8 @@ namespace dndb.Cards
             
             string url = @"https://ddb.ac/characters/7577901/EwYJYR";
             var parser = new CharacterLoader("sampleCampaign");
-            await parser.LoadSingleCharacterAsync(url);
-
+            //await parser.LoadSingleCharacterCardAsync(url);
+            parser.LoadSingleCharacter("");
             Console.ReadKey(); ;
         }
     }
