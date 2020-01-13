@@ -1,5 +1,4 @@
 ﻿using AngleSharp;
-using dndb.Cards.Parser.CharacterData.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -104,17 +103,5 @@ namespace dndb.Cards.Parser
 
         }
 
-        public DDBCharacter LoadSingleCharacter(string url)
-        {
-
-            string jsonData = File.ReadAllText(@"C:\dev\dotnet\dndb.Cards\TempData\characterData.json");
-            var character = DDBCharacter.FromJson(jsonData);
-            var mySimplifiedStuff = character.Character.Stats.Select(x => x.Name + "|" + x.Value);
-
-
-
-            return character;
-
-        }
     }
 }
