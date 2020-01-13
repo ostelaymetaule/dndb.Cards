@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\dndb.Cards.ImageManipulation\dndb.Cards.ImageManipulation.csproj" />
     <ProjectReference Include="..\dndb.Cards.Parser\dndb.Cards.Parser.csproj" />
   </ItemGroup>
 
