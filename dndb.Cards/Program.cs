@@ -1,5 +1,6 @@
 ﻿using dndb.Cards.Parser;
 using System;
+using System.Linq;
 
 namespace dndb.Cards
 {
@@ -7,13 +8,23 @@ namespace dndb.Cards
     {
         static async System.Threading.Tasks.Task Main(string[] args)
         {
-           
-            
-            string url = @"https://ddb.ac/characters/7577901/EwYJYR";
-            var parser = new CharacterLoader("sampleCampaign");
-            await parser.LoadSingleCharacterCardAsync(url);
+            if (args.Any())
+            {
+                var url = args.FirstOrDefault();
+                var parser = new CharacterLoader("sampleCampaign");
+                await parser.LoadSingleCharacterCardAsync(url);
 
- 
+                var imgMod = new ImageModification();
+
+                parser.GetDownloadedImagePaths()
+                    .ForEach(x =>
+                        imgMod.StretchCharCard(x)
+                    );
+            }
+            else
+            {
+                System.Console.WriteLine("please give a url to the character shareble link, f.Ex.: https://ddb.ac/characters/7577901/EwYJYR");
+            }
         }
     }
 }

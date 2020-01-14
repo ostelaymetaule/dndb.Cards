@@ -9,20 +9,22 @@ namespace dndb.Cards.Parser
     public class CharacterLoader
     {
         private DirectoryInfo _campaignDownloadDir;
-        private string _campaign;
         public CharacterLoader(string campaign)
         {
-            _campaign = campaign;
             SetupDownloadPath(campaign);
         }
 
         private void SetupDownloadPath(string campaign)
         {
             DirectoryInfo downloadDir = new DirectoryInfo("downloads");
-            if (!downloadDir.Exists)
+
+            if (downloadDir.Exists)
             {
-                downloadDir.Create();
+                //Cleanup
+                downloadDir.Delete(true);
             }
+            downloadDir.Create();
+
             _campaignDownloadDir = downloadDir.GetDirectories().FirstOrDefault(x => x.Name == campaign);
 
             if (_campaignDownloadDir==null)
