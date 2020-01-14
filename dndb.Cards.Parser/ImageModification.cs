@@ -32,18 +32,22 @@ namespace dndb.Cards.Parser
                 var strDexon = image.Clone(ctx => ctx.Crop(new Rectangle(0, 200, 600, 200)));
                 var intWisCha = image.Clone(ctx => ctx.Crop(new Rectangle(600, 200, 600, 200)));
                 var armorHitpoints = image.Clone(ctx => ctx.Crop(new Rectangle(0, 400, 600, 200)));
+                var dndbeyondLogo = image.Clone(ctx => ctx.Crop(new Rectangle(600, 400, 600, 200)).Rotate(180));
+
+
                 var rotatedPortrait = portraitAndName.Clone(k => k.Rotate(180));
 
                 //Pack all the parts in a vertical alighned column
-                var assembly = new Image<Rgba32>(600, 1000);
+                var assembly = new Image<Rgba32>(600, 1200);
 
                 var options = new GraphicsOptions { ColorBlendingMode = PixelColorBlendingMode.Normal };
                 assembly.Mutate(x => x.DrawImage(rotatedPortrait, new Point(0, 0), options));
+                assembly.Mutate(x => x.DrawImage(dndbeyondLogo, new Point(0, 200), options));
 
-                assembly.Mutate(x => x.DrawImage(portraitAndName, new Point(0, 200), options));
-                assembly.Mutate(x => x.DrawImage(strDexon, new Point(0, 400), options));
-                assembly.Mutate(x => x.DrawImage(intWisCha, new Point(0, 600), options));
-                assembly.Mutate(x => x.DrawImage(armorHitpoints, new Point(0, 800), options));
+                assembly.Mutate(x => x.DrawImage(portraitAndName, new Point(0, 400), options));
+                assembly.Mutate(x => x.DrawImage(strDexon, new Point(0, 600), options));
+                assembly.Mutate(x => x.DrawImage(intWisCha, new Point(0, 800), options));
+                assembly.Mutate(x => x.DrawImage(armorHitpoints, new Point(0, 1000), options));
 
 
                 var savePath = Path.Combine(subdir.FullName, "_vertical_" + fileInfo.Name);
