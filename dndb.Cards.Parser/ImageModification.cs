@@ -17,12 +17,12 @@ namespace dndb.Cards.Parser
         /// rearanges the open graph image to be used as initiative tracker
         /// </summary>
         /// <param name="charCardUrl"></param>
-        public void StretchCharCard(string charCardUrl)
+        public string StretchCharCard(string charCardUrl)
         {
             FileInfo fileInfo = new FileInfo(charCardUrl);
             var parentDir = fileInfo.Directory;
             var subdir = parentDir.CreateSubdirectory("vertical");
-            
+            string readyImagePath = "";
 
 
             using (Image image = Image.Load(charCardUrl))
@@ -52,10 +52,10 @@ namespace dndb.Cards.Parser
 
                 var savePath = Path.Combine(subdir.FullName, "_vertical_" + fileInfo.Name);
                 assembly.Save(savePath); // Automatic encoder selected based on extension.
-
+                readyImagePath = savePath;
                 System.Console.WriteLine("Successifully generated a initiative card: " + savePath);
             }
-
+            return readyImagePath;
         }
     }
 }
