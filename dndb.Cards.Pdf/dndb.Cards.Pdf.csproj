@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="PdfSharpCore.PdfSharp" Version="1.50.0-beta5-5" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
   </ItemGroup>
 
 </Project>

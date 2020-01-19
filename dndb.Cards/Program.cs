@@ -2,6 +2,7 @@
 using dndb.Cards.Pdf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace dndb.Cards
@@ -10,42 +11,54 @@ namespace dndb.Cards
     {
         static async System.Threading.Tasks.Task Main(string[] args)
         {
-            // if (args.Any())
-            //
+            if (args.Any())
 
-            //{
-            //var url = args.FirstOrDefault();
-            var urlList = new List<string>()
-            {
-                "https://ddb.ac/characters/21830852/JroTgS",
-                "https://ddb.ac/characters/20456033/JdxJk9",
-                "https://ddb.ac/characters/20534054/y4UlXq",
-                "https://ddb.ac/characters/20650459/LMArhd",
-                "https://ddb.ac/characters/20483591/Q6XKZk"
 
-            };
-            var parser = new CharacterLoader("sampleCampaign");
-            foreach (var url in urlList)
             {
-                await parser.LoadSingleCharacterCardAsync(url);
+
+
+                var fileUrl = args.FirstOrDefault();
+                Console.WriteLine("File path given: " + fileUrl);
+                if (!File.Exists(fileUrl))
+                {
+                    Console.WriteLine("File not found");
+                    Console.ReadLine();
+                    return;
+                }
+                
+                var urlList = File.ReadAllLines(fileUrl).ToList();
+
+                Console.WriteLine("found following links in the file:");
+                urlList.ForEach(url => Console.WriteLine(url));
+                
+                var parser = new CharacterLoader("sampleCampaign");
+                foreach (var url in urlList)
+                {
+                    Console.WriteLine("Downloading and parsing OG Card from " + url);
+
+                    await parser.LoadSingleCharacterCardAsync(url);
+                }
+
+                var imgMod = new ImageModification();
+                var listOfImages = parser.GetDownloadedImagePaths();
+
+                var listOfStreatchedImages = listOfImages
+                     .Select(x =>
+                         imgMod.StretchCharCard(x)
+                     ).ToList();
+
+                var pdfCombiner = new PdfCombiner();
+
+                var outputPath = pdfCombiner.Combine(listOfStreatchedImages);
+                Console.WriteLine("Done. Check out " + outputPath);
+                Console.ReadLine();
+
             }
-
-            var imgMod = new ImageModification();
-
-            var listOfStreatchedImages = parser.GetDownloadedImagePaths()
-                 .Select(x =>
-                     imgMod.StretchCharCard(x)
-                 ).ToList();
-
-            var pdfCombiner = new PdfCombiner();
-
-            pdfCombiner.Combine(listOfStreatchedImages);
-
-            //}
-            //else
-            //{
-            //    System.Console.WriteLine("please give a url to the character shareble link, f.Ex.: https://ddb.ac/characters/7577901/EwYJYR");
-            //}
+            else
+            {
+                System.Console.WriteLine("please give a file with a list of the character shareble links one per line, f.Ex.: https://ddb.ac/characters/7577901/EwYJYR");
+                Console.ReadLine();
+            }
         }
     }
 }
