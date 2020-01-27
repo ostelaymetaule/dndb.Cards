@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dndb.Cards", "dndb.Cards\dn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dndb.Cards.Parser", "dndb.Cards.Parser\dndb.Cards.Parser.csproj", "{088E5BD5-9E01-4D7A-B9B0-8A96E64A8E04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dndb.Cards.Pdf", "dndb.Cards.Pdf\dndb.Cards.Pdf.csproj", "{F0CF2797-1320-4075-8DD9-E06BCB5DD81C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dndb.Cards.Pdf", "dndb.Cards.Pdf\dndb.Cards.Pdf.csproj", "{F0CF2797-1320-4075-8DD9-E06BCB5DD81C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dndb.Cards.Bot", "dndb.Cards.Bot\dndb.Cards.Bot.csproj", "{66CA0916-8EB0-4610-8F84-3ED17D3F9BD7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{F0CF2797-1320-4075-8DD9-E06BCB5DD81C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0CF2797-1320-4075-8DD9-E06BCB5DD81C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0CF2797-1320-4075-8DD9-E06BCB5DD81C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66CA0916-8EB0-4610-8F84-3ED17D3F9BD7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66CA0916-8EB0-4610-8F84-3ED17D3F9BD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66CA0916-8EB0-4610-8F84-3ED17D3F9BD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66CA0916-8EB0-4610-8F84-3ED17D3F9BD7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
