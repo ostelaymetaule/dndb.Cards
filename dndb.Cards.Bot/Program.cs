@@ -9,7 +9,7 @@ namespace dndb.Cards.Bot
         {
             
             Console.WriteLine("starting bot!");
-            string token = "1004803078:AAF-GFggKCPeVxIyUS94L3mbP3xohkPxiFU";
+            string token = "";
             var myBotListner = new CardParserBot(token);
 
 
