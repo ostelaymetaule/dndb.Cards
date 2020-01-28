@@ -12,8 +12,6 @@ namespace dndb.Cards
         static async System.Threading.Tasks.Task Main(string[] args)
         {
             if (args.Any())
-
-
             {
 
 
@@ -30,26 +28,39 @@ namespace dndb.Cards
 
                 Console.WriteLine("found following links in the file:");
                 urlList.ForEach(url => Console.WriteLine(url));
-                
-                var parser = new CharacterLoader("sampleCampaign");
+
+                List<Stream> downloadedImages = new List<Stream>();
+                var parser = new CharacterLoader();
                 foreach (var url in urlList)
                 {
                     Console.WriteLine("Downloading and parsing OG Card from " + url);
 
-                    await parser.LoadSingleCharacterCardAsync(url);
+                    var freshImage = await parser.LoadSingleCharacterCardAsync(url);
+                    downloadedImages.Add(freshImage);
                 }
 
                 var imgMod = new ImageModification();
-                var listOfImages = parser.GetDownloadedImagePaths();
+               
 
-                var listOfStreatchedImages = listOfImages
+                var listOfStreatchedImages = downloadedImages
                      .Select(x =>
                          imgMod.StretchCharCard(x)
                      ).ToList();
 
                 var pdfCombiner = new PdfCombiner();
 
-                var outputPath = pdfCombiner.Combine(listOfStreatchedImages);
+                var outputDoc = pdfCombiner.Combine(listOfStreatchedImages);
+                var outputDir = new FileInfo(fileUrl).Directory.CreateSubdirectory("generated_pdfs");
+           
+
+                var outputPath = Path.Combine(outputDir.FullName, DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".pdf");
+
+                using (FileStream fs = new FileStream(outputPath, FileMode.Create))
+                {
+                    outputDoc.CopyTo(fs);
+                    fs.Flush();
+                }
+
                 Console.WriteLine("Done. Check out " + outputPath);
                 Console.ReadLine();
 
