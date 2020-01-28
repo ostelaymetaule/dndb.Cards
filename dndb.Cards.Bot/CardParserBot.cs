@@ -186,7 +186,7 @@ namespace dndb.Cards.Bot
             bool isDdbShareableLink = false;
             if (!String.IsNullOrEmpty(lastElement))
             {
-                isDdbShareableLink = lastElement.ToCharArray().All(x => Char.IsLetter(x));
+                isDdbShareableLink = lastElement.ToCharArray().All(x => Char.IsLetterOrDigit(x));
             }
 
             if (startsWithDdb && isDdbShareableLink)
