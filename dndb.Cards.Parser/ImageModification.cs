@@ -19,6 +19,7 @@ namespace dndb.Cards.Parser
         /// <param name="charCardUrl"></param>
         public Stream StretchCharCard(Stream charCardStream)
         {
+            //somehow the imageloader can't load a stream directly
             var memstream = charCardStream as MemoryStream;
             var data = memstream.ToArray();
            
