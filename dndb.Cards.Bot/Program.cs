@@ -7,17 +7,16 @@ namespace dndb.Cards.Bot
 
         static void Main(string[] args)
         {
-            
+            var token = Environment.GetEnvironmentVariable("BotToken");
+            if (string.IsNullOrEmpty(token))
+            {
+                Console.WriteLine("Token cant be null or empty, please set BotToken env variable");
+                return;
+            }
             Console.WriteLine("starting bot!");
-            string token = "";
             var myBotListner = new CardParserBot(token);
 
-
-           
             Console.WriteLine("ending bot");
-
         }
-
-       
     }
 }

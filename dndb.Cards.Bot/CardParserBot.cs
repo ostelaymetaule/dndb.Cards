@@ -1,12 +1,16 @@
 ﻿using dndb.Cards.Parser;
 using dndb.Cards.Pdf;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 
 namespace dndb.Cards.Bot
@@ -14,7 +18,7 @@ namespace dndb.Cards.Bot
     public class CardParserBot
     {
         private ITelegramBotClient _botClient;
-        private IDictionary<long, List<string>> _chatMessages;
+        private ConcurrentDictionary<long, List<string>> _chatMessages;
         private PdfCombiner _pdfCombiner;
         private CharacterLoader _charLoader;
         private ImageModification _imgMod;
@@ -24,10 +28,10 @@ namespace dndb.Cards.Bot
             _charLoader = new CharacterLoader();
             _imgMod = new ImageModification();
 
-            _chatMessages = new Dictionary<long, List<string>>();
+            _chatMessages = new ConcurrentDictionary<long, List<string>>();
             _botClient = new TelegramBotClient(token);
             Console.WriteLine($"bot will run until {TimeSpan.MaxValue.TotalDays.ToString()}");
-           
+
             _botClient.OnMessage += Bot_OnMessage;
             _botClient.OnCallbackQuery += _botClient_OnCallbackQueryAsync;
             _botClient.StartReceiving();
@@ -45,78 +49,82 @@ namespace dndb.Cards.Bot
         {
             var messageText = e.CallbackQuery.Message.Text;
             var replyData = e.CallbackQuery.Data;
+            var chat = e.CallbackQuery.Message.Chat;
             if (messageText != null && replyData == "Generare Pdf")
             {
-                Console.WriteLine($"Received a CallbackQuery message for PDF generation in chat  {e.CallbackQuery.Message.Chat.Id}.");
-
-
-                await _botClient.SendTextMessageAsync(
-                  chatId: e.CallbackQuery.Message.Chat,
-                  text: "Starting generating your pdf, please wait."
-                );
-
-
-
-
-                List<string> urlsFromMemmory;
-                _chatMessages.TryGetValue(e.CallbackQuery.Message.Chat.Id, out urlsFromMemmory);
-
-                if (urlsFromMemmory != null && urlsFromMemmory.Any())
-                {
-                    await _botClient.SendTextMessageAsync(
-                      chatId: e.CallbackQuery.Message.Chat,
-                      text: String.Join(", ", urlsFromMemmory.Select(x=>x.TakeLast(6)))
-                    );
-
-                    await _botClient.SendTextMessageAsync(
-                      chatId: e.CallbackQuery.Message.Chat,
-                      text: "downloading OG images"
-                    );
-                    List<Stream> downloadedImages = new List<Stream>();
-
-                    foreach (var url in urlsFromMemmory)
-                    {
-                        Console.WriteLine("Downloading and parsing OG Card from " + url);
-                        await _botClient.SendTextMessageAsync(
-                           chatId: e.CallbackQuery.Message.Chat,
-                           text: "Downloading " + url.TakeLast(6)
-                         ); ;
-                        var freshImage = await _charLoader.LoadSingleCharacterCardAsync(url);
-                        Thread.Sleep(1000);
-                        downloadedImages.Add(freshImage);
-                    }
-
-                    await _botClient.SendTextMessageAsync(
-                        chatId: e.CallbackQuery.Message.Chat,
-                        text: "cutting and rearranging images"
-                      );
-
-                    var listOfStreatchedImages = downloadedImages
-                         .Select(x =>
-                             _imgMod.StretchCharCard(x)
-                         ).ToList();
-
-                    await _botClient.SendTextMessageAsync(
-                     chatId: e.CallbackQuery.Message.Chat,
-                     text: "generating pdf"
-                   );
-
-                    var outputDoc = _pdfCombiner.Combine(listOfStreatchedImages);
-
-                    await _botClient.SendDocumentAsync(
-                      chatId: e.CallbackQuery.Message.Chat,
-                      new Telegram.Bot.Types.InputFiles.InputOnlineFile(outputDoc, "combinedStretchedCards.pdf")
-                    );
-                    listOfStreatchedImages.ForEach(x => x.Dispose());
-                    downloadedImages.ForEach(x => x.Dispose());
-                    outputDoc.Dispose();
-                }
-
-
-                FlushUrlFromMemory(e.CallbackQuery.Message.Chat.Id);
-
+                await Task.Run(async () => await ProcessPdf(chat));
             }
         }
+
+        private async Task ProcessPdf(Chat chat)
+        {
+            Console.WriteLine($"Received a CallbackQuery message for PDF generation in chat  {chat.Id}.");
+
+
+            await _botClient.SendTextMessageAsync(
+              chatId: chat,
+              text: "Starting generating your pdf, please wait."
+            );
+
+            List<string> urlsFromMemmory;
+            _chatMessages.TryGetValue(chat.Id, out urlsFromMemmory);
+
+            if (urlsFromMemmory != null && urlsFromMemmory.Any())
+            {
+                await _botClient.SendTextMessageAsync(
+                  chatId: chat,
+                  text: String.Join(", ", urlsFromMemmory.Select(x => string.Concat(x.TakeLast(6))))
+                );
+
+                await _botClient.SendTextMessageAsync(
+                  chatId: chat,
+                  text: "downloading OG images"
+                );
+                List<Stream> downloadedImages = new List<Stream>();
+
+                foreach (var url in urlsFromMemmory)
+                {
+                    Console.WriteLine("Downloading and parsing OG Card from " + url);
+                    await _botClient.SendTextMessageAsync(
+                       chatId: chat,
+                       text: "Downloading " + string.Concat(url.TakeLast(6))
+                     ); ;
+                    var freshImage = await _charLoader.LoadSingleCharacterCardAsync(url);
+                    //waiting some time before trying next image
+                    Thread.Sleep(5000);
+                    downloadedImages.Add(freshImage);
+                }
+
+                await _botClient.SendTextMessageAsync(
+                    chatId: chat,
+                    text: "cutting and rearranging images"
+                  );
+
+                var listOfStreatchedImages = downloadedImages
+                     .Select(x =>
+                         _imgMod.StretchCharCard(x)
+                     ).ToList();
+
+                await _botClient.SendTextMessageAsync(
+                 chatId: chat,
+                 text: "generating pdf"
+               );
+
+                var outputDoc = _pdfCombiner.Combine(listOfStreatchedImages);
+
+                await _botClient.SendDocumentAsync(
+                  chatId: chat,
+                  new Telegram.Bot.Types.InputFiles.InputOnlineFile(outputDoc, "combinedStretchedCards.pdf")
+                );
+                listOfStreatchedImages.ForEach(x => x.Close());
+                downloadedImages.ForEach(x => x.Close());
+                outputDoc.Close();
+            }
+
+
+            FlushUrlFromMemory(chat.Id);
+        }
+
         private async void AskButtonWithCallBack(long chatId, string qustionText, List<string> options)
         {
             var keyboard = new InlineKeyboardMarkup(options.Select(x => new[] { new InlineKeyboardButton() { Text = x, CallbackData = x } }).ToArray());
@@ -126,16 +134,11 @@ namespace dndb.Cards.Bot
         }
         void SaveUrlToMemory(long id, string text)
         {
-            if (_chatMessages.ContainsKey(id))
-            {
-                _chatMessages[id].Add(text);
-            }
-            else
-            {
-                List<string> previousMessages;
-                previousMessages = new List<string> { text };
-                _chatMessages.Add(id, previousMessages);
-            }
+
+            List<string> previousMessages;
+            previousMessages = new List<string> { text };
+            _chatMessages.AddOrUpdate(id, previousMessages, (key, oldValue) => { oldValue.Add(text); return oldValue; });
+
         }
 
         void FlushUrlFromMemory(long id)
@@ -156,17 +159,17 @@ namespace dndb.Cards.Bot
                 //Validate the send text is a URL to DDB
                 if (ValidateAndSaveDdbUrl(e.Message.Chat.Id, e.Message.Text))
                 {
-
+                    AskButtonWithCallBack(e.Message.Chat.Id, "Generate pdf or send more links?", new List<string>() { "Generare Pdf" });
                 }
                 else
                 {
                     await _botClient.SendTextMessageAsync(
                      chatId: e.Message.Chat,
-                     text: $"You sending:\n{e.Message.Text}\n which is not a valid Shareable link from DDB. The right link looks like ```https://ddb.ac/characters/20536107/VuZtzz``` and is accesable via character portrait dropdown menu"
-                   );
+                     text: $"You sending:\n{e.Message.Text}\n which is not a valid Shareable link from DDB. The right link looks like `https://ddb.ac/characters/20536107/VuZtzz` and is accesable via character portrait dropdown menu",
+                     parseMode: ParseMode.Html,
+                     disableWebPagePreview: true
+                     );
                 }
-
-                AskButtonWithCallBack(e.Message.Chat.Id, "Generate pdf or send more links?", new List<string>() { "Generare Pdf" });
             }
         }
 
