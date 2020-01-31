@@ -165,7 +165,7 @@ namespace dndb.Cards.Bot
                 {
                     await _botClient.SendTextMessageAsync(
                      chatId: e.Message.Chat,
-                     text: $"You sending:\n{e.Message.Text}\n which is not a valid Shareable link from DDB. The right link looks like `https://ddb.ac/characters/20536107/VuZtzz` and is accesable via character portrait dropdown menu",
+                     text: $"Hallo there, can you please send a valid Shareable link from dndbeyond.com, which you can access via the drop down menu beside your character portrait. The right link looks like https://ddb.ac/characters/20536107/VuZtzz and is accesable via character portrait dropdown menu",
                      parseMode: ParseMode.Html,
                      disableWebPagePreview: true
                      );
