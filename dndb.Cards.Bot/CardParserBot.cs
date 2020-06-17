@@ -76,8 +76,8 @@ namespace dndb.Cards.Bot
             _chatDocuments.TryGetValue(chat.Id, out fileIdsFromMemmory);
             List<Stream> downloadedImages = new List<Stream>();
             List<Stream> downloadedDocumentImages = new List<Stream>();
-
-            if (downloadedImages.Any() || (urlsFromMemmory != null && urlsFromMemmory.Any()))
+            List<Stream> listOfStreatchedImages = new List<Stream>();
+            if (fileIdsFromMemmory.Any())
             {
                 await _botClient.SendTextMessageAsync(
                  chatId: chat,
@@ -97,48 +97,49 @@ namespace dndb.Cards.Bot
                     downloadedDocumentImages.Add(fileStream);
                 }
             }
-
-
-            await _botClient.SendTextMessageAsync(
+            if (urlsFromMemmory != null && urlsFromMemmory.Any())
+                {
+                await _botClient.SendTextMessageAsync(
               chatId: chat,
               text: String.Join(", ", urlsFromMemmory.Select(x => string.Concat(x.TakeLast(6))))
             );
 
-            await _botClient.SendTextMessageAsync(
+                await _botClient.SendTextMessageAsync(
+                  chatId: chat,
+                  text: "downloading OG images"
+                );
+
+                foreach (var url in urlsFromMemmory)
+                {
+                    Console.WriteLine("Downloading and parsing OG Card from " + url);
+                    await _botClient.SendTextMessageAsync(
+                       chatId: chat,
+                       text: "Downloading " + string.Concat(url.TakeLast(6))
+                     );
+                    var freshImage = await _charLoader.LoadSingleCharacterCardAsync(url);
+                    //waiting some time before trying next image
+                    Thread.Sleep(5000);
+                    downloadedImages.Add(freshImage);
+                }
+                await _botClient.SendTextMessageAsync(
               chatId: chat,
-              text: "downloading OG images"
+              text: "cutting and rearranging images"
             );
 
-            foreach (var url in urlsFromMemmory)
-            {
-                Console.WriteLine("Downloading and parsing OG Card from " + url);
+                listOfStreatchedImages = downloadedImages
+                     .Select(x =>
+                         _imgMod.StretchCharCard(x)
+                     ).ToList();
+
                 await _botClient.SendTextMessageAsync(
-                   chatId: chat,
-                   text: "Downloading " + string.Concat(url.TakeLast(6))
-                 );
-                var freshImage = await _charLoader.LoadSingleCharacterCardAsync(url);
-                //waiting some time before trying next image
-                Thread.Sleep(5000);
-                downloadedImages.Add(freshImage);
+                 chatId: chat,
+                 text: "generating pdf"
+               );
             }
 
 
-            await _botClient.SendTextMessageAsync(
-                chatId: chat,
-                text: "cutting and rearranging images"
-              );
-
-            var listOfStreatchedImages = downloadedImages
-                 .Select(x =>
-                     _imgMod.StretchCharCard(x)
-                 ).ToList();
-
-            await _botClient.SendTextMessageAsync(
-             chatId: chat,
-             text: "generating pdf"
-           );
-            listOfStreatchedImages.AddRange(downloadedDocumentImages);
-            var outputDoc = _pdfCombiner.Combine(listOfStreatchedImages);
+            //listOfStreatchedImages.AddRange(downloadedDocumentImages);
+            var outputDoc = _pdfCombiner.Combine(listOfStreatchedImages, downloadedDocumentImages);
 
             await _botClient.SendDocumentAsync(
               chatId: chat,
@@ -198,12 +199,14 @@ namespace dndb.Cards.Bot
             }
             else if (ValidateAndSaveImage(e.Message.Chat.Id, e.Message.Document))
             {
+
                 await _botClient.SendTextMessageAsync(
                  chatId: e.Message.Chat,
                  text: $"You send a document, hopefully an png image. well put it near the cards",
                  parseMode: ParseMode.Html,
                  disableWebPagePreview: true
                  );
+                AskButtonWithCallBack(e.Message.Chat.Id, "Generate pdf or send more?", new List<string>() { "Generare Pdf" });
             }
             else
             {
