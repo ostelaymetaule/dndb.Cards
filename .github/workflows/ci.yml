@@ -38,13 +38,21 @@ jobs:
             SSH_KEY: ${{ secrets.SSHKEY }}
             SSH_HOST: ${{ secrets.SSHHOSTSCALEWAYIP }}
 
-        - name: Stop the server
-          run: ssh scalewayprod 'docker stop dndbcards && docker rm dndbcards'
+        
 
         - name: Check out the source
-          run: ssh scalewayprod 'cd ../dndb.Cards && git fetch && git reset --hard origin/master && echo "$MY_ENV" > env && docker build -t dndb-cards-bot . '
+          run: ssh scalewayprod 'cd ../dndb.Cards && git fetch && git reset --hard origin/master && echo "$MY_ENV" > env '
           env:
-            MY_ENV: ${{ secrets.ENV }}
+            MY_ENV: ${{ secrets.ENV }} 
+            
+        - name: Stop the server
+          run: ssh scalewayprod 'docker stop dndbcards'
+          
+        - name: RM the image
+          run: ssh scalewayprod 'docker rm dndbcards'
+          
+        - name: Build the image
+          run: ssh scalewayprod 'docker build -t dndb-cards-bot . '
 
         - name: Start the server
           if: ${{ always() }}
