@@ -46,16 +46,16 @@ jobs:
             MY_ENV: ${{ secrets.ENV }} 
             
         - name: Stop the server
-          run: ssh scalewayprod 'docker stop dndbcards'
+          run: ssh scalewayprod 'cd ../dndb.Cards && docker stop dndbcards'
           
         - name: RM the image
-          run: ssh scalewayprod 'docker rm dndbcards'
+          run: ssh scalewayprod 'cd ../dndb.Cards && docker rm dndbcards'
           
         - name: Build the image
-          run: ssh scalewayprod 'docker build -t dndb-cards-bot . '
+          run: ssh scalewayprod 'cd ../dndb.Cards && docker build -t dndb-cards-bot . '
 
         - name: Start the server
           if: ${{ always() }}
-          run: ssh scalewayprod 'docker run -d  --name dndbcards --env-file ./env -p 8091:80  -t dndb-cards-bot:latest'
+          run: ssh scalewayprod 'cd ../dndb.Cards && docker run -d  --name dndbcards --env-file ./env -p 8091:80  -t dndb-cards-bot:latest'
 
  
