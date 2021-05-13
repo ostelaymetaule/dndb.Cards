@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "dndb.Cards": {
+      "commandName": "Project",
+      "commandLineArgs": "urlList.txt"
+    }
+  }
+}

@@ -4,43 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
+
 namespace dndb.Cards.Parser
 {
     public class CharacterLoader
     {
-        private DirectoryInfo _campaignDownloadDir;
-        public CharacterLoader(string campaign)
-        {
-            SetupDownloadPath(campaign);
-        }
-
-        private void SetupDownloadPath(string campaign)
-        {
-            DirectoryInfo downloadDir = new DirectoryInfo("downloads");
-
-            if (downloadDir.Exists)
-            {
-                //Cleanup
-                downloadDir.Delete(true);
-            }
-            downloadDir.Create();
-
-            downloadDir.CreateSubdirectory(campaign);
-            _campaignDownloadDir = downloadDir.GetDirectories().FirstOrDefault(x => x.Name == campaign);
-
-            if (_campaignDownloadDir == null)
-            {
-                _campaignDownloadDir = downloadDir.CreateSubdirectory(campaign);
-            }
-
-        }
-        public List<string> GetDownloadedImagePaths()
-        {
-            return _campaignDownloadDir.GetFiles("*.png")
-                .Select(x => x.FullName)
-                .ToList();
-        }
-
         /**
             example see below, og:image is the card image with the background rendered on the ddb
 
@@ -73,7 +42,7 @@ namespace dndb.Cards.Parser
 
 
 
-        public async System.Threading.Tasks.Task LoadSingleCharacterCardAsync(string url)
+        public async Task<MemoryStream> LoadSingleCharacterCardAsync(string url)
         {
             var config = Configuration.Default.WithDefaultLoader();
             var address = url;
@@ -89,17 +58,18 @@ namespace dndb.Cards.Parser
             var ogTitleSelector = "meta[property=og\\:title]";
             var ogTitleElement = document.Head.QuerySelector(ogTitleSelector);
             var ogTitle = ogTitleElement.GetAttribute("content");
-            var downloadPath = Path.Combine(_campaignDownloadDir.FullName, ogTitle + ".png");
 
             using (var client = new HttpClient())
-            using (var file = new FileStream(path: downloadPath, FileMode.OpenOrCreate))
             {
+                var ms = new MemoryStream();
                 var response = await client.GetAsync(ogImageUrl);
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
-                    var memstream = await response.Content.ReadAsStreamAsync();
-                    await memstream.CopyToAsync(file);
+                    var responseStream = await response.Content.ReadAsStreamAsync();
+                    await responseStream.CopyToAsync(ms);
+                    
                 }
+                return ms;
             }
         }
     }
