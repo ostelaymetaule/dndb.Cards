@@ -42,7 +42,9 @@ jobs:
           run: ssh scalewayprod 'cd ../dndb.Cards && git fetch && git reset --hard origin/master && echo "$MY_ENV" > env '
              
         - name: Write Env file
-          run: ssh scalewayprod 'echo "$MY_ENV" > ../dndb.Cards/env '
+          run: |
+            echo "$MY_ENV"
+            ssh scalewayprod "cat > ../dndb.Cards/env"
           env:
             MY_ENV: ${{ secrets.ENV }} 
             
