@@ -1,0 +1,53 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+      name: "Deploy to scalewayprod"
+      runs-on: ubuntu-latest
+      if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+      # needs: test
+      steps:
+        - name: Configure SSH
+          run: |
+            mkdir -p ~/.ssh/
+            echo "$SSH_KEY" > ~/.ssh/scalewayprod.key
+            chmod 600 ~/.ssh/scalewayprod.key
+            cat >>~/.ssh/config <<END
+            Host scalewayprod
+              HostName $SSH_HOST
+              User $SSH_USER
+              IdentityFile ~/.ssh/scalewayprod.key
+              StrictHostKeyChecking no
+            END
+          env:
+            SSH_USER: ${{ secrets.SSHUSER }}
+            SSH_KEY: ${{ secrets.SSHKEY }}
+            SSH_HOST: ${{ secrets.SSHHOSTSCALEWAYIP }}
+
+        - name: Stop the server
+          run: ssh scalewayprod 'docker stop dndbcards && docker rm dndbcards'
+
+        - name: Check out the source
+          run: ssh scalewayprod 'cd ../dndb.Cards && git fetch && git reset --hard origin/master && echo "$MY_ENV" > env && docker build -t dndb-cards-bot . '
+          env:
+            MY_ENV: ${{ secrets.ENV }}
+
+        - name: Start the server
+          if: ${{ always() }}
+          run: ssh scalewayprod 'docker run -d  --name dndbcards --env-file ./env -p 8091:80  -t dndb-cards-bot:latest'
+
+ 
