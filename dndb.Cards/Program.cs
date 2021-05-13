@@ -11,6 +11,16 @@ namespace dndb.Cards
     {
         static async System.Threading.Tasks.Task Main(string[] args)
         {
+
+            var parser = new CharacterLoader();
+
+            // https://character-service.dndbeyond.com/character/v3/character/{characterId}
+            var charData =  await parser.LoadCharJsonAsync(@"https://character-service.dndbeyond.com/character/v3/character/" + 13146184);
+            //await TestPdfCardsFromImage(args);
+        }
+
+        private static async System.Threading.Tasks.Task TestPdfCardsFromImage(string[] args)
+        {
             if (args.Any())
             {
 
@@ -23,7 +33,7 @@ namespace dndb.Cards
                     Console.ReadLine();
                     return;
                 }
-                
+
                 var urlList = File.ReadAllLines(fileUrl).ToList();
 
                 Console.WriteLine("found following links in the file:");
@@ -40,7 +50,7 @@ namespace dndb.Cards
                 }
 
                 var imgMod = new ImageModification();
-               
+
 
                 var listOfStreatchedImages = downloadedImages
                      .Select(x =>
@@ -51,7 +61,7 @@ namespace dndb.Cards
 
                 var outputDoc = pdfCombiner.Combine(listOfStreatchedImages);
                 var outputDir = new FileInfo(fileUrl).Directory.CreateSubdirectory("generated_pdfs");
-           
+
 
                 var outputPath = Path.Combine(outputDir.FullName, DateTime.Now.ToString("yyyy-MM-dd_hh-mm-ss") + ".pdf");
 

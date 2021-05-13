@@ -7,6 +7,9 @@ namespace dndb.Cards.Bot
 
         static void Main(string[] args)
         {
+
+            
+
             var token = "";// Environment.GetEnvironmentVariable("BotToken");
             if (string.IsNullOrEmpty(token))
             {

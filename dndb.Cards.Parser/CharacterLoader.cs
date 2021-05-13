@@ -67,10 +67,34 @@ namespace dndb.Cards.Parser
                 {
                     var responseStream = await response.Content.ReadAsStreamAsync();
                     await responseStream.CopyToAsync(ms);
-                    
+
                 }
                 return ms;
             }
+        }
+
+        public async Task<Character.CharacterData> LoadCharJsonAsync(string url)
+        {
+            Character.CharacterData ret = null;
+
+            using (var client = new HttpClient())
+            {
+                var response = await client.GetAsync(url);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                {
+
+                    var content = await response.Content.ReadAsStringAsync();
+
+
+                    ret = Newtonsoft.Json.JsonConvert.DeserializeObject<Character.CharacterData>(content);
+
+                    //var responseStream = await response.Content.ReadAsStreamAsync();
+                    //await responseStream.CopyToAsync(ms);
+
+                }
+            }
+            return ret;
+
         }
     }
 }
